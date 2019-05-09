@@ -1,0 +1,30 @@
+{
+  "name": "stamp_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "scripts": {
+    "start": "./node_modules/.bin/env-cmd -f ./config/dev.env node src/index.js",
+    "dev": "./node_modules/.bin/env-cmd -f ./config/dev.env nodemon src/index.js",
+    "test": "./node_modules/.bin/env-cmd -f ./config/test.env jest --watchAll --runInBand"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.5.5",
+    "mongoose-unique-validator": "^2.0.3",
+    "supertest": "^4.0.2",
+    "validator": "^10.11.0"
+  },
+  "devDependencies": {
+    "env-cmd": "^9.0.1",
+    "jest": "^24.8.0",
+    "nodemon": "^1.19.0"
+  }
+}
