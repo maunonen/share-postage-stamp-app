@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const validator = require('validator')
 
 const addressSchema = new mongoose.Schema({
     country : {
@@ -14,12 +15,7 @@ const addressSchema = new mongoose.Schema({
     postalcode : {
         type : String, 
         required : true, 
-        trim : true, 
-        validate (value) {
-            if (! validator.isPostalCode(value)){
-                throw new Error ('Postalcode is not valid')
-            }
-        }
+        trim : true
     }, 
     address : {
         type : String, 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const validator = require('validator')
 
 const stampSchema = new mongoose.Schema({
     name : {
@@ -37,6 +38,19 @@ const stampSchema = new mongoose.Schema({
 }, {
     timestamps : true
 })
+
+// clear stamp object before return it to the client 
+
+stampSchema.methods.toJSON = function () {
+
+    const stamp = this
+    const stampObject = stamp.toObject()
+    
+    delete stampObject.createdAt
+    delete stampObject.updatedAt
+
+    return stampObject
+}    
 
 const Stamp = mongoose.model('Stamp', stampSchema)
 module.exports = Stamp
