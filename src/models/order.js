@@ -26,7 +26,8 @@ const orderSchema = new mongoose.Schema({
         ref : 'User'
     }, 
     shipment : {
-        type : mongoose.Schema.Types.ObjectId
+        type : mongoose.Schema.Types.ObjectId, 
+        ref : 'Shipment'
     }, 
 
     address : {
@@ -34,6 +35,8 @@ const orderSchema = new mongoose.Schema({
         required : true, 
         ref : 'Address'
     }, 
+    // sent, approved, paid, delivered
+
     status : {
         type : String,
         required : true

@@ -14,6 +14,15 @@ const shipmentSchema = new mongoose.Schema({
                 throw new Error('Reciept URL is not valid') 
             }
         }
+    }, 
+    shipper : {
+        type : String
+    }, 
+    trackingNumber : {
+        type : String
+    }, 
+    sentDate : {
+        type : Date
     }
 }, {
     timestamps : true
