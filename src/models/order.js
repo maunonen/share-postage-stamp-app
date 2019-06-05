@@ -3,18 +3,20 @@ const mongoose = require('mongoose')
 const Address = require('./address')
 const Stamp = require('./stamp')
 const User = require('./user')
+const validator = require('validator')
 
 const orderSchema = new mongoose.Schema({
     description : {
         type : String, 
         trim : true
     }, 
-    // may be here should be an array of stamp 
-    stamp  : {
-        type : mongoose.Schema.Types.ObjectId, 
-        ref : 'Stamp', 
-        required : true
-    }, 
+    stamps : [
+        {
+            type : mongoose.Schema.Types.ObjectId, 
+            ref : 'Stamp', 
+            required : true
+        }
+    ], 
     client : {
         type : mongoose.Schema.Types.ObjectId,
         required : true, 
@@ -25,18 +27,51 @@ const orderSchema = new mongoose.Schema({
         required : true, 
         ref : 'User'
     }, 
-    shipment : {
-        type : mongoose.Schema.Types.ObjectId, 
-        ref : 'Shipment'
-    }, 
 
-    address : {
-        type : mongoose.Schema.Types.ObjectId, 
-        required : true, 
-        ref : 'Address'
+    fullAddress : {
+        country : {
+            type : String, 
+            required : true, 
+            trim : true
+        }, 
+        city : {
+            type : String, 
+            required: true, 
+            trim : true
+        }, 
+        postalcode : {
+            type : String, 
+            required : true, 
+            trim : true
+        }, 
+        address : {
+            type : String, 
+            required : true,
+            trim : true
+        }
     }, 
+ 
     // sent, approved, paid, delivered
 
+    shipments : [{
+        receiptUrl  : {
+            type : String, 
+            validate (value) {
+                if (!validator.isURL(value)){
+                    throw new Error('Reciept URL is not valid') 
+                }
+            }
+        }, 
+        shipper : {
+            type : String
+        }, 
+        trackingNumber : {
+            type : String
+        }, 
+        sentDate : {
+            type : Date
+        }
+    }], 
     status : {
         type : String,
         required : true

@@ -79,8 +79,8 @@ router.patch('/shipment/:id' , auth, async (req, res) => {
             {
                 $lookup : {
                     from: "Order",
-                    localField : "_id", 
-                    foreignField : "shipment",   
+                    localField : "order", 
+                    foreignField : "_id",   
                     as : "order_doc"
                   }
             }

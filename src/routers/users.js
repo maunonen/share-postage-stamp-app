@@ -7,7 +7,7 @@ const router = new express.Router()
 
 // GET /tasks?country=Finland
 
-router.get('/users/', async (req, res) => {
+router.get('/users/', auth, async (req, res) => {
 
     // get country from query parametr 
     const country = req.query.country
@@ -35,13 +35,13 @@ router.get('/users/profile', auth, async (req, res) => {
 // get use by id 
 router.get('/users/:id', async (req, res) => {
 
-    
+    // ???? 
 
 }) 
 
 // delete user
 
-router.delete('/users', auth, async (req, res) => {
+router.delete('/users/me', auth, async (req, res) => {
 
     try {
         await req.user.remove()
@@ -70,8 +70,6 @@ router.patch('/users', auth, async (req, res) => {
         updates.forEach((update) => {
             req.user[update] = req.body[update]
         } )
-
-        console.log(updates)
         await req.user.save()
         res.status(200).send(req.user)
     } catch (error) {
@@ -126,7 +124,7 @@ router.post('/users', async (req, res) => {
         res.status(201).send({user, token})
 
     } catch (e) {
-        res.status(400).send(e)
+        res.status(400).send({ error : e.message || e})
     }
 
 } )

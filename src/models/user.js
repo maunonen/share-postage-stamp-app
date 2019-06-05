@@ -11,7 +11,7 @@ const Stamp = require('./stamp')
 const userSchema = new mongoose.Schema({
     username : {
         type : String, 
-        minlenght : 6, 
+        minlenght : 4, 
         required : true, 
         trim : true, 
         unique : true 
