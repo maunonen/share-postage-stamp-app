@@ -9,7 +9,7 @@
   "scripts": {
     "start": "./node_modules/.bin/env-cmd -f ./config/dev.env node src/index.js",
     "dev": "./node_modules/.bin/env-cmd -f ./config/dev.env nodemon src/index.js",
-    "test": "./node_modules/.bin/env-cmd -f ./config/test.env jest --watchAll --runInBand"
+    "test": "./node_modules/.bin/env-cmd -f ./config/test.env jest --watchAll --verbose true --bail false --runInBand"
   },
   "author": "",
   "license": "ISC",

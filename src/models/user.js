@@ -16,10 +16,26 @@ const userSchema = new mongoose.Schema({
         trim : true, 
         unique : true 
     }, 
-    country : {
-       type : String, 
-       trim : true
+
+    location :{
+        country : {
+            type : String, 
+            trim : true
+        }, 
+        city : {
+            type : String,  
+            trim : true
+        }, 
+        postalcode : {
+            type : String,  
+            trim : true
+        }, 
+        address : {
+            type : String, 
+            trim : true
+        }
     }, 
+ 
     phonenumber : {
         type : String, 
         required : true, 
