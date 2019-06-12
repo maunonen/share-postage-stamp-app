@@ -10,13 +10,13 @@ const orderSchema = new mongoose.Schema({
         type : String, 
         trim : true
     }, 
-    stamps : [
-        {
+    stamps : [{
+        stamp :  {
             type : mongoose.Schema.Types.ObjectId, 
             ref : 'Stamp', 
             required : true
         }
-    ], 
+    }], 
     client : {
         type : mongoose.Schema.Types.ObjectId,
         required : true, 

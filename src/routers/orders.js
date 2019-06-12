@@ -14,7 +14,9 @@ router.post('/orders/shipment/:id', auth , async (req, res) => {
 
     try {
         const updatedOrder = await Order.findOneAndUpdate(
-            { _id : req.params.id } , 
+            { _id : req.params.id, 
+                sender :req.user.id
+            } , 
             { "$push" : {
                "shipments"  : req.body}, 
             }, 
@@ -180,10 +182,14 @@ router.post('/orders', auth, async (req, res) => {
 router.patch('/orders/:id' , auth, async (req, res) => {
 
 const updates = Object.keys(req.body)
+
+//console.log(updates)
+
 const allowedUpdates = [
-    'description', 'stamp', 'client', 'sender', 'shipment', 
+    'description', 'stamps', 'client', 'sender', 'shipment', 
     'status', 'payed', 'sum', 'country', 'city', 'postalcode', 
-    'address'
+    'fullAddress'
+    
 ] 
 
 const isUpdatesValid = updates.every((update) =>  allowedUpdates.includes(update))
@@ -222,7 +228,7 @@ router.delete('/orders/:id', auth, async (req, res) => {
     
     try {
         const deletedOrder = await Order.findOneAndDelete({
-            _id : req.params.id 
+            _id : req.params.id, 
             //client : req.user.id
         })
         if (!deletedOrder) {

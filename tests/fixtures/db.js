@@ -14,6 +14,12 @@ const stampTwoId = new mongoose.Types.ObjectId()
 const stampThreeId = new mongoose.Types.ObjectId()
 const stampFourId = new mongoose.Types.ObjectId()
 
+const orderOneId  = new mongoose.Types.ObjectId()
+const orderTwoId  = new mongoose.Types.ObjectId()
+const orderThreeId  = new mongoose.Types.ObjectId()
+const orderFourId  = new mongoose.Types.ObjectId()
+
+
 const userOne = {
     _id : userOneId, 
     username : "Jari", 
@@ -57,7 +63,7 @@ const userFour = {
 }
 
 const userThree = {
-    _id : userTwoId, 
+    _id : userThreeId, 
     username : "Ja", 
     phonenumber : "04023423", 
     email : "jarigmail.com",
@@ -102,6 +108,108 @@ const stampThreeUserTwo = {
     owner : userTwoId
 }
 
+const orderOneUserOne = {
+    _id : orderOneId, 
+    description : "First order ", 
+    stamps : [{ stamp : stampOneId}], 
+    client : userTwoId, 
+    sender : userOneId, 
+    fullAddress : {
+        country : 'Finland', 
+        city : 'Vantaa', 
+        postalcode : '01510', 
+        address : 'Lautamiehentie 4 C'
+    }, 
+    status : 'new', 
+    sum : 5.61
+}
+
+const orderTwoUserOne = {
+    _id : orderTwoId, 
+    description : "Second order ", 
+    stamps : [{ stamp : stampTwoId}], 
+    client : userTwoId, 
+    sender : userOneId, 
+    fullAddress : {
+        country : 'Finland', 
+        city : 'Vantaa', 
+        postalcode : '01510', 
+        address : 'Lautamiehentie 4 C'
+    }, 
+    status : 'new', 
+    sum : 4.67
+}
+
+const orderThreeUserTwo = {
+    _id : orderThreeId, 
+    description : "Third order ", 
+    stamps : [{ stamp : stampThreeId}], 
+    client : userOneId, 
+    sender : userTwoId, 
+    fullAddress : {
+        country : 'Finland', 
+        city : 'Vantaa', 
+        postalcode : '01510', 
+        address : 'Lautamiehentie 4 C'
+    }, 
+    status : 'new', 
+    sum : 6.90
+}
+
+const orderFourUserTwo = {
+    _id : orderFourId, 
+    description : "Third order ", 
+    stamps : [{ stamp : stampThreeId}], 
+    client : userOneId, 
+    sender : userTwoId, 
+    fullAddress : {
+        country : 'Finland', 
+        city : 'Vantaa', 
+        postalcode : '01510', 
+        address : 'Lautamiehentie 4 C'
+    }, 
+    status : 'new', 
+    sum : 6.90
+}
+
+const orderNotAllowed = {
+    _id : orderFourId, 
+    description : "Third order ", 
+    stamps : [{ stampThreeId}], 
+    client : userOneId, 
+    sender : userTwoId, 
+    fullAddress : {
+        country : 'Finland', 
+        city : 'Vantaa', 
+        postalcode : '01510', 
+        address : 'Lautamiehentie 4 C'
+    }, 
+    status : 'new', 
+    sum : 6.90, 
+    sometype : 'some type', 
+    anotherField : 'another fields'
+}
+
+const orderInvalid = {
+    _id : orderFourId, 
+    description : 23, 
+    stamps : [{ stampThreeId}], 
+    client : userOneId, 
+    sender : userTwoId, 
+    fullAddress : {
+        country : 'Finland', 
+        city : 'Vantaa', 
+        postalcode : '01510', 
+        address : 'Lautamiehentie 4 C'
+    }, 
+    status : 'new', 
+    sum : 'fsvs'
+}
+
+
+
+
+
 const  setupDatabase = async () => {
     await User.deleteMany()
 
@@ -114,6 +222,7 @@ const setupDatabaseLoginUser = async () =>{
 const setupDataBaseTestStamp = async () => {
     await User.deleteMany()
     await Stamp.deleteMany()
+    await Order.deleteMany()
     await new User(userOne).save()
     await new User(userTwo).save()
     await new Stamp(stampOneUserOne).save()
@@ -121,9 +230,22 @@ const setupDataBaseTestStamp = async () => {
     await new Stamp(stampThreeUserTwo).save()
 }
 
+const setupDatabaseTestOrder = async () => {
+    await Order.deleteMany() 
+    await new User(userFour).save()
+    await new Order(orderOneUserOne).save() 
+    await new Order(orderTwoUserOne).save() 
+    await new Order(orderThreeUserTwo).save() 
+    await new Order(orderFourUserTwo).save() 
+}
+
 module.exports = {
     userOne, userThree, userTwo, userOneId, 
     userTwoId, setupDatabase, setupDatabaseLoginUser, 
     setupDataBaseTestStamp, stampOneId, stampTwoId, stampThreeId, 
-    userFour, userFourId, stampFourId
+    userFour, userFourId, stampFourId, 
+    orderOneId, orderTwoId, orderThreeId, orderFourId, 
+    orderOneUserOne, orderTwoUserOne, orderThreeUserTwo, orderFourUserTwo, 
+    setupDatabaseTestOrder, orderNotAllowed, orderInvalid
+    
 }
