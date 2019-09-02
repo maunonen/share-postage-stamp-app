@@ -20,6 +20,10 @@ const orderThreeId  = new mongoose.Types.ObjectId()
 const orderFourId  = new mongoose.Types.ObjectId()
 
 
+const shipmentOneId = new mongoose.Types.ObjectId()
+const shipmentTwoId = new mongoose.Types.ObjectId()
+const shipmentThreeId = new mongoose.Types.ObjectId()
+
 const userOne = {
     _id : userOneId, 
     username : "Jari", 
@@ -108,6 +112,30 @@ const stampThreeUserTwo = {
     owner : userTwoId
 }
 
+// Shipment 
+
+const shipmentOne = {
+    _id : shipmentOneId, 
+    receiptUrl : 'https://www.rbc.ru/imgq.jpg', 
+    shipper : 'DHL', 
+    trackingNumber : 'DHL-249t7249t', 
+    sentDate : 1560340555
+}
+const shipmentTwo = {
+    _id : shipmentTwoId, 
+    receiptUrl : 'https://www.rbc.ru/imgq.jpg', 
+    shipper : 'Fedex', 
+    trackingNumber : 'Fedex-249t7249t', 
+    sentDate : 1560340666
+}
+const shipmentThree = {
+    _id : shipmentThreeId, 
+    receiptUrl : 'https://www.rbc.ru/imgq.jpg', 
+    shipper : 'Posti', 
+    trackingNumber : 'Posti-249t7249t', 
+    sentDate : 1560340777
+}
+
 const orderOneUserOne = {
     _id : orderOneId, 
     description : "First order ", 
@@ -120,6 +148,7 @@ const orderOneUserOne = {
         postalcode : '01510', 
         address : 'Lautamiehentie 4 C'
     }, 
+    shipments : [ shipmentOne, shipmentTwo, shipmentThree ], 
     status : 'new', 
     sum : 5.61
 }
@@ -246,6 +275,7 @@ module.exports = {
     userFour, userFourId, stampFourId, 
     orderOneId, orderTwoId, orderThreeId, orderFourId, 
     orderOneUserOne, orderTwoUserOne, orderThreeUserTwo, orderFourUserTwo, 
-    setupDatabaseTestOrder, orderNotAllowed, orderInvalid
+    setupDatabaseTestOrder, orderNotAllowed, orderInvalid, 
+    shipmentOneId, shipmentTwoId, shipmentThreeId
     
 }

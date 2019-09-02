@@ -34,23 +34,35 @@ router.post('/orders/shipment/:id', auth , async (req, res) => {
 })
 
 // delete shipment by shipment 
-//Done
+// '/orders/shipment/:id - order ID'
+// '/orders/shipment/:id?user.id  = '
 
 router.delete('/orders/shipment/:id', auth ,  async (req, res) => {
     try {
+        // 
+        if (!req.params.id ){
+            return res.status(400).send({ error : "Please specify order ID"})
+        }
+        if (Object.keys(req.query).length === 0 && req.query.constructor === Object ){
+            return res.status(400).send({ error : "Please specify shipment ID"})
+        }
         const deleteFromOrder = await Order.findOneAndUpdate(
-            { _id :req.params.id }, 
+            //{ _id :req.params.id, sender :req.user.id }, 
+            {  sender :req.user.id }, 
             { "$pull" : {
-                "shipments" : {  "_id" :  req.query.id} }}
-            //{ new : true }
+                "shipments" : {  "_id" :  req.query.id} }},
+            { new : true }
         )
+        //console.log(deleteFromOrder)
+
         if (!deleteFromOrder){
-            return res.status(404).send({ error : "Order not found or can't be updadte"})
+            //return res.status(404).send({ error : "Order not found or can't be updadte"})
+            return res.status(404).send(deleteFromOrder)
         }
         res.status(200).send("shipments has been deleted")
     } catch (e){
         res.status(400).send({
-             error : e.message || e1
+             error : e.message || e
         })
     }
 
@@ -63,6 +75,12 @@ router.delete('/orders/shipment/:id', auth ,  async (req, res) => {
 router.patch('/orders/shipment/:id', auth , async (req, res) => {
     try { 
         // createe array to updates
+        if (!req.params.id) {
+            return res.status(400).send({ error : "Lpease specify Order ID"})
+        }
+        if (Object.keys(req.query).length === 0 && req.query.constructor === Object ){
+            return res.status(400).send({ error : "Please specify shipment ID"})
+        }
         const arrayUpdates = {}    
         const updates = Object.keys(req.body)
         const allowedUpdates = [
@@ -82,7 +100,8 @@ router.patch('/orders/shipment/:id', auth , async (req, res) => {
         }
 
         const updatedOrder = await Order.findOneAndUpdate(
-            { _id : req.params.id, "shipments._id" : req.query.id }, 
+            { _id : req.params.id, "shipments._id" : req.query.id, 
+                sender : req.user.id }, 
             { "$set" : arrayUpdates }, 
             { new : true, runValidators : true }
         )
@@ -102,7 +121,7 @@ router.patch('/orders/shipment/:id', auth , async (req, res) => {
 // get list of shipment by order ID, by shipment ID, by clinet, by sender
 
 
-router.get('/orders/shipment/' , auth, async (req, res) => {
+router.get('/orders/shipment' , auth, async (req, res) => {
     
 /* 
     const arrayOfShipment = {}
@@ -158,6 +177,7 @@ router.get('/orders/shipment/' , auth, async (req, res) => {
 
     }
 })
+
 
 
 // create new order

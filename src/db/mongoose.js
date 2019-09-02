@@ -3,7 +3,7 @@ const mongoose =  require('mongoose')
 mongoose.connect(process.env.MONGODB_URL, {
 
     // fixing deprecation warnings of MongoBD 
-    
+    replicaSet: 'luontovahdit-shard-0', 
     useNewUrlParser : true, 
     useCreateIndex : true, 
     useFindAndModify : false
@@ -14,3 +14,8 @@ mongoose.connect(process.env.MONGODB_URL, {
 }).catch((e) => {   
     console.log('Can not coonect to DB')
 }) 
+
+//const session =  mongoose.startSession() 
+
+module.exports = mongoose
+

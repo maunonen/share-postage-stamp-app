@@ -12,8 +12,15 @@ const addressRouter = require('./routers/addresses')
 const orderRouter = require('./routers/orders')
 const paymentRoute = require('./routers/payments')
 const shipmentRoute = require('./routers/shipments')
+const cors = require('cors')
 
 app.use(express.json())
+
+// allowed react app on port 3000 using router 
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+  }));
 
 app.use ( (err, req, res, next) => {
     

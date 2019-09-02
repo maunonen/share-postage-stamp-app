@@ -70,6 +70,12 @@ const userSchema = new mongoose.Schema({
         type : Number, 
         default : 0 
     }, 
+    cart : [{
+        stamp : {
+            type : mongoose.Schema.Types.ObjectId, 
+            ref : 'Stamp'
+        }
+    }], 
     tokens : [{
         token : {
             type : String, 

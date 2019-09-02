@@ -5,14 +5,15 @@ const User = require('../src/models/user')
 const Stamp = require('../src/models/stamp')
 const mongoose = require('mongoose')
 
-const shipmentOneId = new mongoose.Types.ObjectId()
-const shipmentTwoId = new mongoose.Types.ObjectId()
 
 const {setupDataBaseTestStamp, orderOneId, orderTwoId, orderThreeId, orderFourId,
        orderOne, orderTwoUserOne, orderThreeUserTwo, orderFourUserTwo, 
        setupDatabaseTestOrder, userOne, userOneId, orderOneUserOne, orderNotAllowed,
-       orderInvalid, stampTwoId, userFour
+       orderInvalid, stampTwoId, userFour, shipmentOneId, shipmentTwoId, shipmentThreeId,
+       userTwoId
     } = require('./fixtures/db')
+
+
 
 describe('POST /orders/shipment/:id - adding shipment to order', () => {
     beforeEach(setupDataBaseTestStamp)
@@ -42,7 +43,7 @@ describe('POST /orders/shipment/:id - adding shipment to order', () => {
     }
 
     test('User provide valid (token, order id, shipment data) STATUS 200', async() => {
-        await request(app)
+        const res = await request(app)
             .post('/orders/shipment/' + orderOneId)
             .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
             .send(shipmentValid) 
@@ -113,87 +114,208 @@ describe('POST /orders/shipment/:id - adding shipment to order', () => {
 describe('DELETE /orders/shipment/:id?id=shipmentid', () => {
     beforeEach(setupDataBaseTestStamp)
     beforeEach(setupDatabaseTestOrder)
-    test('Users provide valid (token, order id, shipment id, he is owner of order. STATUS 200)', async() => {
-        await request(app)
+    
+    test('Users provide valid (token, order id, shipment id, he is owner of order. STATUS 200)', async() => {      
+        const resDelted = await request(app)
             .delete('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
             .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
             .expect(200)
-    })
-
-    test.skip('User provide valid (token, order id, shipment id), but he is now owner of order STATUS 404', async() => {
-        
-    })
-    test.skip('User provide invalid token. STATUS 401', async() => {
-        
-    })
-    test.skip('User provide valid (token, order id, he is owner), invalid (shipment id). STATUS 404', async() => {
-        
-    })
-    test.skip('Valid (token, shipment id) user is owner, invalid (order ID). STATUS 404', async() => {
-        
-    })
-    test.skip('Valid (token, shipment id) he is owner, and query parametr has not provide. STATUS 400  ', async() => {
-        
-    })
-    test.skip('Valid (token, shipment id) he is woner, but req.params has not provide. STATUS 400', async() => {
-        
-    })
-    test.skip('Invalid(broken) order ID. STATUS 400', async() => {
-        
-    })
-    test.skip('Invalid(broken) shipment ID 400', async() => {
+        const shipVal = await Order.findById( orderOneId)
+        expect(shipVal.shipments.length).toEqual(2)
         
     })
 
-
+    test('User provide valid (token, order id, shipment id), but he is not owner of order STATUS 404', async() => {
+        await request(app)
+            .delete('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userFour.tokens[0].token}`)
+            .expect(404)
+    })
+    
+    test('User provide invalid token. STATUS 401', async() => {
+        await request(app)
+            .delete('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${'sfvfsvsvs'}`)
+            .expect(401)
+    })
+    test('User provide valid (token, order id, he is owner), broken/empty/undefined/wrong (shipment id). STATUS 400', async() => {
+        await request(app)
+            .delete('/orders/shipment/' + orderOneId + '?id=' + 'sfjvnsfkv')
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(400)
+        await request(app)
+            .delete('/orders/shipment/' + orderOneId + '?id=' + undefined)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(400)
+        await request(app)
+            .delete('/orders/shipment/' + orderOneId )
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(400)
+        await request(app)
+            .delete('/orders/shipment/' + orderOneId + '?id=' + shipmentThreeId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(200)
+        //console.log(res.body)
+    })
+    test.skip('Valid (token, shipment id) user is owner, broken/empty/undefined/wrong (order ID). STATUS 404/400', async() => {
+        await request(app)
+            .delete('/orders/shipment/' + 'sfhvshvb' + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(400)
+        await request(app)
+            .delete('/orders/shipment/' + undefined + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(400)
+        await request(app)
+            .delete('/orders/shipment/' + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(400) 
+        await request(app)
+            .delete('/orders/shipment/')
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(400) 
+        await request(app)
+            .delete('/orders/shipment/' + orderFourId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(404)       
+    })
+    test('Valit token shipment id. User is not a sender' , async ()=>{
+        await request(app)
+            .delete('/orders/shipment/' + orderOneId +'?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userFour.tokens[0].token}`)
+            .expect(404)
+        
+    })
 })
 
 describe('PATCH /orders/shipment/:id - update shipments ', () => {
-    test.skip('Valid (token, updates, order id, shipment id) user owned the order. STATUS 200', async() => {
-
+    beforeEach(setupDataBaseTestStamp)
+    beforeEach(setupDatabaseTestOrder)
+    const shipValidUpdates = {
+        receiptUrl : 'https://www.rbc.ru/fedex.jpg', 
+        shipper : 'Fedex'
+        //trackingNumber : 'Fedex-249t7249t', 
+    }
+    const shipInvalidUpdates = {
+        receiptUrlERD : 'https://www.rbc.ru/fedex.jpg', 
+        shipper1 : 'Fedex', 
+        trackingNumber1 : 'Fedex-249t7249t', 
+    }
+    const shipNotAllowed = {
+        receiptUrl : 'httpspg', 
+        shipper : 567, 
+        trackingNumber : 39765, 
+    } 
+    test('Valid (token, updates, order id, shipment id) user owned the order. STATUS 200', async() => {
+        await request(app)
+                .patch('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+                .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+                .send(shipValidUpdates) 
+                .expect(200)
+        const shipUpdated = await Order.findById( orderOneId)
+        expect(shipUpdated.shipments[0].shipper).toEqual('Fedex')
     })
 
-    test.skip('Invalid token. STATUS 401', async() => {
-        
+    test('Invalid token. STATUS 401', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${'vjbsvkjsbv'}`)
+            .send(shipValidUpdates) 
+            .expect(401)
     })
 
-    test.skip('Invalid/broken order ID. 400', async() => {
-        
+    test('Invalid/broken order ID. 400', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + 'fhvbfdf' + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(400)
+        await request(app)
+            .patch('/orders/shipment/' + orderFourId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(404)
     })
 
-    test.skip('Invalid (not exist) order ID. STATUS 400', async() => {
-        
+    test('Invalid (not exist) order ID. STATUS 400', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(400)
+        await request(app)
+            .patch('/orders/shipment/' + undefined + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(400)
     })
-    test.skip('Invalid/broken shipment ID 400', async() => {
-        
+    test('Invalid/broken shipment ID 400', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId + '?id=' )
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(400)
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId + '?id=' + undefined)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(400)
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId )
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(400)
     })
-    test.skip('Invalid (not exist) shipment id 404', async() => {
-        
+  
+    test('Invalid(broken) updates object. STATUS 400', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send('{invalid,}') 
+            .type('json')
+            .expect(400)
     })
-    test.skip('Invalid(broken) updates object. STATUS 400', async() => {
-        
+    test('Invalid values of updates object. STATUS 400', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipInvalidUpdates) 
+            .expect(400)
     })
-    test.skip('Invalid values of updates object. STATUS 400', async() => {
-        
-    })
-    test.skip('Updates not allowed. STATUS 400', async() => {
-        
+    test('Updates not allowed. STATUS 400', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .send(shipNotAllowed) 
+            .expect(400)
     })
 
-    test.skip('User doesnt own the order. STATUS 404', async() => {
-        
-    })
-    test.skip('Shipment ID has not provided. STATUS 400', async() => {
-        
-    })
-    test.skip('Order ID has not provided. STATUS 400', async() => {
-        
+    test('User doesnt own the order. STATUS 404', async() => {
+        await request(app)
+            .patch('/orders/shipment/' + orderOneId + '?id=' + shipmentOneId)
+            .set('Authorization', `Bearer ${userFour.tokens[0].token}`)
+            .send(shipValidUpdates) 
+            .expect(404)
     })
 })
 
 describe('GET /orders/shipment - get list of order shipment due quering string', () => {
-    test.skip('Valid (token, client id, sender id, order _id, shipment id). Shipments is exist. STATUS 200', async() => {
-
+    beforeEach(setupDataBaseTestStamp)
+    beforeEach(setupDatabaseTestOrder)
+    test('Valid (token, client id, sender id, order _id, shipment id). Shipments is exist. STATUS 200', async() => {
+        const res = await request(app)
+            .get('/orders/shipment' + '?' + 
+                //'_id=' + orderOneId 
+                //+
+                //'client=' + userTwoId 
+                //+
+                'sender=' + userTwoId 
+                //+ 
+                //'&shipment=' + shipmentOneId
+            )
+            .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+            .expect(200)
+        console.log(res.body)
     })
 
     test.skip('All parametrs are valid. Shipments doesnt exist. STATUS 404 ', async() => {
@@ -423,7 +545,7 @@ describe('DELETE /orders/:id  - delete order', () =>{
                 .set('Authorization', `Bearer ${userOne.tokens[0].token}`)                                                 
                 .expect(404)
     })
-    test('Valid (token, order id). User is not client of the order. STATUS 404', async () => {
+    test.skip('Valid (token, order id). User is not client of the order. STATUS 404', async () => {
         await request(app)
                 .delete('/orders/' + orderThreeId)  
                 .set('Authorization', `Bearer ${userFour.tokens[0].token}`)                                                 
